@@ -1,0 +1,29 @@
+name: "Build"
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 2
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.3.1
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      - name: msbuild
+        run: |
+          msbuild src\CE.sln -m /p:platform="x64" /p:configuration="Release"
+      - name: test
+        run: .\Release\Tests_Release_x64.exe
+
